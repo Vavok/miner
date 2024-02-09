@@ -64,6 +64,7 @@ def refresh_tonapi(tonapi):
             time.sleep(3)
         except Exception as e:
             print(str(e))
+        time.sleep(3)
 tonapi = Tonapi(api_key=TOKEN)
 seed,complexity,iterations=0,0,0
 t0 = threading.Thread(target=refresh_tonapi,args=(tonapi,))
@@ -100,7 +101,18 @@ async def main_send(MNEMONICS,giver_address,n) -> None:
         await provider.start_up()
         global seed, complexity,  iterations
         wallet = await WalletV4R2.from_mnemonic(provider, MNEMONICS)
-        path_to_exe = 'pow-miner-cuda'
+        ## Определение операционной системы
+        operating_system = os.name
+
+        if operating_system == 'posix':
+            path_to_exe = 'pow-miner-cuda'
+        elif operating_system == 'nt':
+            print("Windows")
+            path_to_exe = 'pow-miner-cuda.exe'
+        else:
+            print("Не удалось определить операционную систему")
+            path_to_exe = 'pow-miner-cuda'
+       # path_to_exe = 'pow-miner-cuda'
         wallet_address = adress(MNEMONICS)
 
         # Замените значения параметров на фактические
@@ -194,16 +206,16 @@ async def main_send(MNEMONICS,giver_address,n) -> None:
                     try:
                         await send(wallet, giver_address,boc)
                     except Exception as e:
-                        print(str(e))
+                        print('НЕ СМОГ ОТПРАВИТЬ РЕШЕНИЕ ',str(e))
 
-                        for p in procs:
-                            parent = psutil.Process(p.pid)
-                            try:
-                                for child in parent.children(recursive=True):
-                                    child.kill()
-                                parent.kill()
-                            except Exception as e:
-                                print(str(e))
+                    for p in procs:
+                        parent = psutil.Process(p.pid)
+                        try:
+                            for child in parent.children(recursive=True):
+                                child.kill()
+                            parent.kill()
+                        except Exception as e:
+                            print(str(e))
 
                     catch+=1
                     time.sleep(5)
