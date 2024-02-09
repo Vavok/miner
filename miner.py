@@ -54,13 +54,16 @@ def adress(mnemonic):
 def refresh_tonapi(tonapi):
     global seed, complexity,  iterations, giver_address
     while True:
-        b = tonapi.blockchain.execute_get_method(giver_address, 'get_pow_params')
-        num_hex = b.stack[0].num
-        seed = int(num_hex, 16)
+        try:
+            b = tonapi.blockchain.execute_get_method(giver_address, 'get_pow_params')
+            num_hex = b.stack[0].num
+            seed = int(num_hex, 16)
       #  print(seed)
-        complexity = int(b.stack[1].num, 16)
-        iterations = int(b.stack[2].num, 16)
-        time.sleep(3)
+            complexity = int(b.stack[1].num, 16)
+            iterations = int(b.stack[2].num, 16)
+            time.sleep(3)
+        except Exception as e:
+            print(str(e))
 tonapi = Tonapi(api_key=TOKEN)
 seed,complexity,iterations=0,0,0
 t0 = threading.Thread(target=refresh_tonapi,args=(tonapi,))
