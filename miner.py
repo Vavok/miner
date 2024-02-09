@@ -82,7 +82,7 @@ async def send(wallet: WalletV4R2, giver_address: str, boc: bytes) -> None:
     try:
         transfer_message = wallet.create_wallet_internal_message(
             destination=Address(giver_address),
-            value=int(0.08 * 1e9),
+            value=int(0.05 * 1e9),
             body=Cell.from_boc(boc)[0].to_slice().load_ref(),
         )
         await wallet.raw_transfer(msgs=[transfer_message])
@@ -97,7 +97,7 @@ async def main_send(MNEMONICS,giver_address,n) -> None:
         await provider.start_up()
         global seed, complexity,  iterations
         wallet = await WalletV4R2.from_mnemonic(provider, MNEMONICS)
-        path_to_exe = 'pow-miner-cuda.exe'
+        path_to_exe = 'pow-miner-cuda'
         wallet_address = adress(MNEMONICS)
 
         # Замените значения параметров на фактические
@@ -119,7 +119,7 @@ async def main_send(MNEMONICS,giver_address,n) -> None:
             complexity_miner = complexity
             iterations_mine=iterations
             print(f'новое задание {seed_mine}')
-            cmd = f'{path_to_exe} -vv -g {i} -F 128 -t {test_time} {wallet_address} {seed_mine} {complexity_miner} {iterations_mine} {giver_address} {path}'
+
 
             procs = []
 
@@ -187,39 +187,41 @@ async def main_send(MNEMONICS,giver_address,n) -> None:
                     print('----------------=============РЕШЕНИЕ НАЙДЕНО==============-----------------------')
                     boc = Path(path).read_bytes()
                     os.remove(path)
+
                     try:
                         await send(wallet, giver_address,boc)
                     except Exception as e:
                         print(str(e))
+
+                        for p in procs:
+                            parent = psutil.Process(p.pid)
+                            try:
+                                for child in parent.children(recursive=True):
+                                    child.kill()
+                                parent.kill()
+                            except Exception as e:
+                                print(str(e))
+
                     catch+=1
                     time.sleep(5)
                     break
                 if seed_mine != seed:
-
-                    for p in procs:
-                        parent = psutil.Process(p.pid)
-                        try:
-                            for child in parent.children(recursive=True):
-                                child.kill()
-                            parent.kill()
-                        except Exception as e:
-                            print(str(e))
-
+                    try:
+                        for p in procs:
+                            parent = psutil.Process(p.pid)
+                            try:
+                                for child in parent.children(recursive=True):
+                                    child.kill()
+                                parent.kill()
+                            except Exception as e:
+                                print(str(e))
+                    except Exception as e:
+                        print(str(e))
                    # print('смена задания')
                     poisk = False
                     break
     except Exception as e:
         print(str(e))
-
-
-
-
-
-
-
-
-
-
 
 
 
