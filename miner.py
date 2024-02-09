@@ -123,7 +123,8 @@ async def main_send(MNEMONICS,giver_address,n) -> None:
 
             procs = []
 
-            for _ in range(n):
+            for g in range(n):
+                cmd = f'{path_to_exe} -vv -g {g} -F 128 -t {test_time} {wallet_address} {seed_mine} {complexity_miner} {iterations_mine} {giver_address} {path}'
                 p = Popen(
                     cmd,
                     stdout=PIPE,
