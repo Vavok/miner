@@ -33,6 +33,14 @@ def export_mnemonic(file):
 MNEMONICS = export_mnemonic('config.txt')
 #giver_address = "EQAidDzp6v4oe-vKFWvsV8MQzY-4VaeUFnGM3ImrKIJUIid9"#100
 giver_address = 'EQCzT8Pk1Z_aMpNukdV-Mqwc6LNaCNDt-HD6PiaSuEeCD0hV'#1000
+with open('config.txt', 'r') as file:
+    r=file.readlines()
+    TOKEN=r[1].replace('TONAPI_TOKEN=','')
+    TOKEN = TOKEN.replace('\n', '')
+    gpu_count=r[2].replace('gpu_count=','')
+    gpu_count=int(gpu_count)
+   # print(TOKEN)
+    print('gpu_count=',gpu_count)
 def adress(mnemonic):
     wallet_workchain = 0
     wallet_version = WalletVersionEnum.v4r2
@@ -84,7 +92,7 @@ async def send(wallet: WalletV4R2, giver_address: str, boc: bytes) -> None:
         raise
 
 
-async def main_send(MNEMONICS,giver_address) -> None:
+async def main_send(MNEMONICS,giver_address,n) -> None:
     try:
         await provider.start_up()
         global seed, complexity,  iterations
@@ -114,7 +122,6 @@ async def main_send(MNEMONICS,giver_address) -> None:
             cmd = f'{path_to_exe} -vv -g {i} -F 128 -t {test_time} {wallet_address} {seed_mine} {complexity_miner} {iterations_mine} {giver_address} {path}'
 
             procs = []
-            n = 1  # Задайте количество процессов здесь
 
             for _ in range(n):
                 p = Popen(
@@ -218,4 +225,4 @@ async def main_send(MNEMONICS,giver_address) -> None:
 
 if __name__ == "__main__":
 
-    asyncio.run(main_send(wallet_mnemonics, giver_address))
+    asyncio.run(main_send(wallet_mnemonics, giver_address,gpu_count))
