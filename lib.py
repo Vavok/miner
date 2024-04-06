@@ -122,7 +122,7 @@ def giverslist():
 
 def close_miner():
     for proc in psutil.process_iter(attrs=['pid', 'name']):
-        if proc.info['name'] == 'pow-miner-cuda.exe':
+        if proc.info['name'] == 'pow-miner-cuda':
             # Закрываем процесс
             psutil.Process(proc.info['pid']).terminate()
     print('close caswallet')
