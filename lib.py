@@ -13,10 +13,10 @@ from tonsdk.utils import to_nano, bytes_to_b64str
 import asyncio
 from pytonlib import TonlibClient
 from tonsdk.utils import to_nano
-import requests
+import requests, os
 from pathlib import Path
-
-
+import psutil
+import shutil, time, random
 
     #print( TOKEN)
 def export_mnemonic(file):
@@ -79,8 +79,58 @@ async def send(boc):
         await client.raw_send_message(transfer_message)
     except Exception as e:
         print(e)
+def check_file_exists(path):
+    if os.path.exists(path):
+        print('решение')
+        return True
+    else:
+        return False
+def close_procs(procs):
+    try:
+        for p in procs:
+            parent = psutil.Process(p.pid)
+
+            try:
+                for child in parent.children(recursive=True):
+                    child.kill()
+                parent.kill()
+            except Exception as e:
+                print(str(e))
+    except:
+        print(...)
 
 
+
+
+def delete_in_folder(folder_path):
+    shutil.rmtree(folder_path)
+    os.mkdir(folder_path)
+# Пример использования
+
+
+def giverslist():
+    addresses = []
+
+    with open('givers.txt', 'r') as file:
+        for line in file:
+            if 'EQ' in line:
+                addresses.append(line.strip())
+
+    print(addresses)
+    random_address = random.choice(addresses)
+    return random_address
+
+def close_miner():
+    for proc in psutil.process_iter(attrs=['pid', 'name']):
+        if proc.info['name'] == 'pow-miner-cuda.exe':
+            # Закрываем процесс
+            psutil.Process(proc.info['pid']).terminate()
+    print('close caswallet')
 if __name__ == '__main__':
-    boc=b'34234234234fdsfdsf'
-    asyncio.get_event_loop().run_until_complete(send(boc))
+    # boc=b'34234234234fdsfdsf'
+    # asyncio.get_event_loop().run_until_complete(send(boc))
+    giverslist()
+
+
+    close_miner()
+    time.sleep(10)
