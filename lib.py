@@ -108,29 +108,26 @@ def delete_in_folder(folder_path):
 # Пример использования
 
 
-def giverslist():
+def giverslist(txt):
     addresses = []
 
-    with open('givers.txt', 'r') as file:
+    with open(txt, 'r') as file:
         for line in file:
             if 'EQ' in line:
                 addresses.append(line.strip())
 
-    print(addresses)
     random_address = random.choice(addresses)
+    print('givers = ', random_address)
     return random_address
 
 def close_miner():
     for proc in psutil.process_iter(attrs=['pid', 'name']):
-        if proc.info['name'] == 'pow-miner-cuda':
+        if proc.info['name'] == 'pow-miner-cuda.exe':
             # Закрываем процесс
             psutil.Process(proc.info['pid']).terminate()
-    print('close caswallet')
+    #print('перезапуск')
 if __name__ == '__main__':
-    # boc=b'34234234234fdsfdsf'
-    # asyncio.get_event_loop().run_until_complete(send(boc))
-    giverslist()
+  
+    giverslist('givers100.txt')
 
-
-    close_miner()
-    time.sleep(10)
+  
